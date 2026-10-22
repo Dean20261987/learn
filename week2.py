@@ -23,7 +23,7 @@ print(type(is_learning))
 # ===== 5. 查看全部 =====
 print("--- 我是迪安2026，正在学 Python ---")
 a = 10
-b = 20
+b = "20"
 print(a + b)
 first = "迪安"
 last = "2026"
@@ -31,9 +31,4 @@ print(first + last)
 name = "迪安2026"
 week = 2
 print(f"我是 {name}，正在学第 {week} 周")
-
 name = "迪安2026"
-week = 2
-time = 25.5
-is_learning = True
-print(f"我是 {name}，正在学第 {week} 周,每日投入{time},是否零基础{is_learning}")
