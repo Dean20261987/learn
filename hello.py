@@ -2,7 +2,7 @@
 # 作者：迪安2026
 # 日期：2026-10-22
 
-print("你好，世界")
+print("Hello World")
 print("我的第一个 Python 程序")
 print("程序跑通了，说明环境没问题")
 
