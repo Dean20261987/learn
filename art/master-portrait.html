@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>色块画 · 主人</title>
+<style>
+  :root{
+    --wall:      #ece5da;
+    --wall2:     #ddd4c6;
+    --band:      #2b2b2e;
+    --ceiling:   #212125;
+    --beam:      #35353b;
+    --curtain:   #7c93a3;
+    --curtain2:  #5f7686;
+    --skin:      #d9a882;
+    --skin2:     #c9906a;
+    --skin3:     #a9704f;
+    --hair:      #1a1817;
+    --hair2:     #2a2522;
+    --jacket:    #1d3450;
+    --jacket2:   #274463;
+    --inner:     #141519;
+    --metal:     #9aa7b0;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:#101014;
+    display:flex; align-items:flex-start; justify-content:center;
+    min-height:100vh;
+    font-family:"Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  /* 外框只负责留白，不设 overflow，避免裁掉东西 */
+  .stage{ padding:24px; }
+
+  /* 画布：800x1000 竖幅，坐标原点在这里 */
+  .frame{
+    position:relative;
+    width:800px; height:1000px;
+    background:linear-gradient(180deg,
+      var(--ceiling) 0%,   var(--ceiling) 21%,
+      var(--band) 21%,     var(--band) 27%,
+      var(--wall) 27%,     var(--wall2) 100%);
+    border-radius:6px;
+    box-shadow:0 30px 90px rgba(0,0,0,.75);
+  }
+
+  /* ================= 背景 ================= */
+  .beam{ position:absolute; background:var(--beam); }
+  .sky-light{
+    position:absolute; left:330px; top:0; width:40px; height:200px;
+    background:linear-gradient(180deg,#fffef5,#fff6d8);
+    box-shadow:0 0 90px 40px rgba(255,250,225,.30);
+  }
+
+  .curtain{
+    position:absolute; left:0; top:200px; width:196px; height:520px;
+    background:var(--curtain);
+  }
+  .curtain::before{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(90deg,
+      rgba(0,0,0,.18) 0 6px, rgba(0,0,0,0) 6px 26px);
+  }
+  .curtain-top{
+    position:absolute; left:0; top:176px; width:118px; height:34px;
+    background:var(--curtain2);
+  }
+
+  .clock{
+    position:absolute; left:646px; top:330px;
+    width:112px; height:112px; border-radius:50%;
+    background:#f8f5ef; border:8px solid #b9885a;
+    box-shadow:0 6px 18px rgba(0,0,0,.16);
+  }
+  .clock::after{
+    content:""; position:absolute; left:50%; top:50%;
+    width:6px; height:6px; margin:-3px 0 0 -3px;
+    background:#3a3a3a; border-radius:50%;
+  }
+  .hand{ position:absolute; left:50%; top:50%; background:#3a3a3a; transform-origin:bottom center; }
+  .hand.h{ width:5px; height:28px; margin-left:-2.5px; margin-top:-28px; transform:rotate(52deg); }
+  .hand.m{ width:3px; height:40px; margin-left:-1.5px; margin-top:-40px; transform:rotate(62deg); }
+
+  /* ================= 主人 ================= */
+
+  /* --- 肩膀 / 外套 --- */
+  .shoulders{
+    position:absolute; left:0; top:800px;
+    width:800px; height:224px;
+    background:var(--jacket);
+    border-radius:50% 50% 0 0 / 46% 46% 0 0;
+  }
+
+  /* 立领：两片往中间收，露出内侧黑内搭 */
+  .collar-l{
+    position:absolute; left:300px; top:820px;
+    width:120px; height:180px;
+    background:var(--jacket2);
+    border-radius:76% 6% 22% 62% / 34% 4% 72% 80%;
+  }
+  .collar-r{
+    position:absolute; left:400px; top:820px;
+    width:120px; height:180px;
+    background:var(--jacket2);
+    border-radius:6% 76% 62% 22% / 4% 34% 80% 72%;
+  }
+
+  /* 黑色内搭：V 形开口 */
+  .inner{
+    position:absolute; left:354px; top:816px;
+    width:112px; height:190px;
+    background:var(--inner);
+    border-radius:44% 44% 14% 14% / 58% 58% 12% 12%;
+  }
+
+  /* 白色滚边（沿领口） */
+  .trim-l{
+    position:absolute; left:352px; top:818px;
+    width:13px; height:188px;
+    background:#e6e1d6; border-radius:7px;
+    transform:rotate(9deg);
+  }
+  .trim-r{
+    position:absolute; left:455px; top:818px;
+    width:13px; height:188px;
+    background:#e6e1d6; border-radius:7px;
+    transform:rotate(-9deg);
+  }
+
+  /* 拉链 */
+  .zipper{
+    position:absolute; left:398px; top:840px;
+    width:4px; height:160px;
+    background:linear-gradient(180deg,#98a2a9,#cfd6da,#98a2a9);
+  }
+  .zip-pull{
+    position:absolute; left:390px; top:930px;
+    width:22px; height:32px;
+    background:#c9d0d5; border-radius:4px 4px 44% 44%;
+    box-shadow:0 2px 4px rgba(0,0,0,.35);
+  }
+  .zip-pull span{
+    position:absolute; left:0; top:8px; width:100%;
+    text-align:center; font-size:11px; font-weight:700;
+    color:#4a5257; font-family:Georgia, serif;
+  }
+
+  /* Tommy 旗标 */
+  .badge{ position:absolute; left:250px; top:912px; width:32px; height:19px; transform:rotate(-4deg); }
+  .badge i{ position:absolute; top:0; width:11px; height:100%; }
+  .badge i:nth-child(1){ left:0;    background:#c8281e; }
+  .badge i:nth-child(2){ left:11px; background:#f2f2f2; }
+  .badge i:nth-child(3){ left:22px; background:#1b2a4a; }
+
+  /* --- 脖子：上端钻进头里，下端钻进衣领里，中间不留缝 --- */
+  .neck{
+    position:absolute; left:344px; top:660px;
+    width:126px; height:180px;
+    background:var(--skin3);
+    border-radius:34% 34% 26% 26% / 18% 18% 22% 22%;
+  }
+  /* 下颌投影：压在脖子上，让头「坐」在脖子上而不是浮着 */
+  .jaw-shadow{
+    position:absolute; left:336px; top:684px;
+    width:142px; height:52px;
+    background:#7d4f36;
+    border-radius:50%;
+    opacity:.34; filter:blur(13px);
+  }
+
+  /* --- 耳朵 --- */
+  .ear{
+    position:absolute; top:452px; width:40px; height:76px;
+    background:var(--skin2);
+    border-radius:50% 50% 50% 50% / 46% 46% 54% 54%;
+  }
+  .ear.l{ left:222px; }
+  .ear.r{ left:542px; }
+
+  /* --- 头型 --- */
+  .head{
+    position:absolute; left:240px; top:292px;
+    width:324px; height:450px;
+    background:var(--skin);
+    border-radius:46% 46% 48% 48% / 42% 42% 58% 58%;
+  }
+
+  /* 阴影 */
+  .shadow{ position:absolute; background:var(--skin2); border-radius:50%; filter:blur(9px); opacity:.5; }
+  .shadow.c1{ left:258px; top:540px; width:64px; height:46px; }
+  .shadow.c2{ left:482px; top:540px; width:64px; height:46px; }
+  .shadow.j1{ left:302px; top:630px; width:32px; height:58px; }
+  .shadow.j2{ left:470px; top:630px; width:32px; height:58px; }
+
+  .forehead-shine{
+    position:absolute; left:336px; top:352px;
+    width:136px; height:48px;
+    background:rgba(255,255,255,.22);
+    border-radius:50%; filter:blur(12px);
+  }
+
+  /* --- 头发 --- */
+  .hair{
+    position:absolute; left:230px; top:266px;
+    width:344px; height:204px;
+    background:var(--hair);
+    border-radius:50% 50% 26% 26% / 64% 64% 36% 36%;
+  }
+  .bang{ position:absolute; background:var(--hair); }
+  .bang.b1{ left:252px; top:328px; width:148px; height:84px; border-radius:64% 36% 56% 44%; transform:rotate(-16deg); }
+  .bang.b2{ left:348px; top:316px; width:142px; height:102px; background:var(--hair2); border-radius:56% 44% 50% 50%; transform:rotate(9deg); }
+  .bang.b3{ left:438px; top:338px; width:116px; height:76px; border-radius:40% 60% 44% 56%; transform:rotate(24deg); }
+  .hair-shine{
+    position:absolute; left:302px; top:278px;
+    width:146px; height:32px;
+    background:rgba(255,255,255,.26);
+    border-radius:50%; filter:blur(8px);
+  }
+  .strand{ position:absolute; background:var(--hair); border-radius:50%; }
+  .strand.s1{ left:216px; top:298px; width:74px; height:9px; transform:rotate(-30deg); }
+  .strand.s2{ left:530px; top:286px; width:68px; height:8px; transform:rotate(20deg); }
+  .strand.s3{ left:198px; top:350px; width:50px; height:7px; transform:rotate(-56deg); }
+  .strand.s4{ left:516px; top:338px; width:48px; height:7px; transform:rotate(48deg); }
+
+  /* --- 眉毛 --- */
+  .brow{ position:absolute; background:var(--hair); border-radius:44% 44% 30% 30%; }
+  .brow.l{ left:274px; top:470px; width:86px; height:17px; transform:rotate(-4deg); }
+  .brow.r{ left:444px; top:470px; width:86px; height:17px; transform:rotate(4deg); }
+
+  /* --- 眼睛 --- */
+  .eye{ position:absolute; width:50px; height:19px; background:#f1e9df; border-radius:46%; }
+  .eye.l{ left:294px; top:522px; }
+  .eye.r{ left:460px; top:522px; }
+  .iris{ position:absolute; width:22px; height:22px; border-radius:50%; background:#463425; }
+  .iris.l{ left:308px; top:521px; }
+  .iris.r{ left:474px; top:521px; }
+  .pupil{ position:absolute; width:10px; height:10px; border-radius:50%; background:#120f0c; }
+  .pupil.l{ left:314px; top:527px; }
+  .pupil.r{ left:480px; top:527px; }
+
+  /* --- 鼻子 --- */
+  .nose{
+    position:absolute; left:381px; top:538px;
+    width:40px; height:116px;
+    background:var(--skin2);
+    border-radius:42% 42% 50% 50%;
+    opacity:.42; filter:blur(4px);
+  }
+  .nostril{ position:absolute; width:16px; height:9px; background:var(--skin3); border-radius:50%; opacity:.6; }
+  .nostril.l{ left:372px; top:642px; }
+  .nostril.r{ left:416px; top:642px; }
+
+  /* --- 胡茬 / 嘴 --- */
+  .stubble{ position:absolute; background:#332720; opacity:.30; border-radius:50%; filter:blur(4px); }
+  .stubble.m1{ left:356px; top:650px; width:88px; height:16px; }
+
+  .mouth{
+    position:absolute; left:366px; top:674px;
+    width:70px; height:20px;
+    background:#8a5850;
+    border-radius:18% 18% 50% 50% / 28% 28% 72% 72%;
+  }
+  .lip-line{
+    position:absolute; left:368px; top:683px;
+    width:66px; height:2px; background:#633a33; opacity:.6;
+  }
+  .stubble.c{ left:350px; top:704px; width:104px; height:30px; }
+
+  /* --- 无框眼镜 --- */
+  .lens{
+    position:absolute; width:132px; height:98px;
+    background:rgba(206,217,223,.24);
+    border:2px solid var(--metal);
+    border-radius:20% 20% 24% 24% / 26% 26% 28% 28%;
+  }
+  .lens.l{ left:254px; top:480px; }
+  .lens.r{ left:420px; top:480px; }
+  .lens::after{
+    content:""; position:absolute; left:10px; top:10px;
+    width:48px; height:26px;
+    background:rgba(255,255,255,.5);
+    border-radius:44% 56% 34% 66%;
+    transform:rotate(-18deg); filter:blur(2px);
+  }
+  .bridge{ position:absolute; left:388px; top:518px; width:30px; height:2px; background:var(--metal); }
+  .temple{ position:absolute; top:516px; width:42px; height:2px; background:var(--metal); }
+  .temple.l{ left:212px; }
+  .temple.r{ left:552px; }
+
+  .caption{
+    position:absolute; left:0; bottom:20px; width:100%;
+    text-align:center; color:#dfe7ec;
+    font-size:13px; letter-spacing:.26em; opacity:.45;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+<div class="frame">
+  <div class="beam" style="left:0; top:0; width:100%; height:30px;"></div>
+  <div class="beam" style="left:110px; top:30px; width:54px; height:180px; transform:skewX(-12deg);"></div>
+  <div class="beam" style="left:610px; top:30px; width:60px; height:180px; transform:skewX(-12deg);"></div>
+  <div class="sky-light"></div>
+
+  <div class="curtain-top"></div>
+  <div class="curtain"></div>
+  <div class="clock">
+    <div class="hand h"></div>
+    <div class="hand m"></div>
+  </div>
+
+  <div class="shoulders"></div>
+  <div class="collar-l"></div>
+  <div class="collar-r"></div>
+  <div class="inner"></div>
+  <div class="trim-l"></div>
+  <div class="trim-r"></div>
+  <div class="zipper"></div>
+  <div class="zip-pull"><span>A</span></div>
+  <div class="badge"><i></i><i></i><i></i></div>
+
+  <div class="neck"></div>
+  <div class="jaw-shadow"></div>
+  <div class="ear l"></div>
+  <div class="ear r"></div>
+
+  <div class="head"></div>
+  <div class="shadow c1"></div>
+  <div class="shadow c2"></div>
+  <div class="shadow j1"></div>
+  <div class="shadow j2"></div>
+  <div class="forehead-shine"></div>
+
+  <div class="hair"></div>
+  <div class="bang b1"></div>
+  <div class="bang b2"></div>
+  <div class="bang b3"></div>
+  <div class="hair-shine"></div>
+  <div class="strand s1"></div>
+  <div class="strand s2"></div>
+  <div class="strand s3"></div>
+  <div class="strand s4"></div>
+
+  <div class="brow l"></div>
+  <div class="brow r"></div>
+
+  <div class="eye l"></div>
+  <div class="eye r"></div>
+  <div class="iris l"></div>
+  <div class="iris r"></div>
+  <div class="pupil l"></div>
+  <div class="pupil r"></div>
+
+  <div class="nose"></div>
+  <div class="nostril l"></div>
+  <div class="nostril r"></div>
+
+  <div class="stubble m1"></div>
+  <div class="mouth"></div>
+  <div class="lip-line"></div>
+  <div class="stubble c"></div>
+
+  <div class="lens l"></div>
+  <div class="lens r"></div>
+  <div class="bridge"></div>
+  <div class="temple l"></div>
+  <div class="temple r"></div>
+
+  <div class="caption">DEAN 2026</div>
+</div>
+</div>
+
+</body>
+</html>

@@ -105,21 +105,29 @@
     transform:rotate(-7deg);
   }
 
-  /* 前鳍：贴着身体下缘，稍微探出去一点 */
+  /* 前鳍：整片压在身体内部，只让下缘探出一点点，不再"贴边" */
   .fin{
-    position:absolute; left:400px; top:360px;
-    width:120px; height:86px;
+    position:absolute; left:390px; top:356px;
+    width:132px; height:100px;
     background:var(--hair2);
     border-radius:60% 40% 55% 45% / 26% 44% 56% 74%;
-    transform:rotate(10deg);
+    transform:rotate(8deg);
   }
 
-  /* 头 */
+  /* 头：往左下方多伸出 60px，钻进身体里，接缝被身体盖住 */
   .w-head{
-    position:absolute; left:466px; top:150px;
+    position:absolute; left:406px; top:150px;
     width:238px; height:214px;
     background:var(--hair);
     border-radius:50% 50% 46% 46% / 56% 56% 44% 44%;
+  }
+  /* 头颈接缝处的过渡阴影，让头"长在"身体上而不是浮着 */
+  .joint-shadow{
+    position:absolute; left:452px; top:300px;
+    width:120px; height:70px;
+    background:var(--hair3);
+    border-radius:50%;
+    opacity:.35; filter:blur(14px);
   }
   /* 头发帘：只盖头顶 */
   .fringe{
@@ -249,6 +257,7 @@
   <div class="fin"></div>
 
   <div class="w-head"></div>
+  <div class="joint-shadow"></div>
   <div class="fringe"></div>
   <div class="sidehair"></div>
   <div class="streak"></div>

@@ -30,3 +30,6 @@ test.log
 
 # DSH 权限修复报告
 .acl-recovery/
+
+# IM 收到的附件缓存
+.dsh-im/
