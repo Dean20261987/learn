@@ -231,49 +231,54 @@ print("脱敏:", re.sub(r"\d{11}", "***********", "电话13812345678"))
 # ============================================
 
 # 练习 A：读一个文件，统计最长的一行有多长
-#   进阶：同时返回行号，方便直接定位
-#   rstrip("\r\n") 才能同时去掉 Windows 的 \r\n 和 Linux 的 \n
 #
+# def longest_line(path):
+#     ...
+#
+# print(longest_line("week4.py"))
 def longest_line(path):
-    """返回 (最长行的行号, 最长行的长度)"""
-    best_len = 0
-    best_no = 0
-    try:
-        with open(path, encoding="utf-8") as f:
-            for no, line in enumerate(f, start=1):
-                length = len(line.rstrip("\r\n"))
-                if length > best_len:
-                    best_len = length
-                    best_no = no
-    except FileNotFoundError:
-        print(f"找不到文件: {path}")
-        return None
-    except UnicodeDecodeError:
-        print(f"{path} 不是 UTF-8 编码")
-        return None
-    return best_no, best_len
-
+    best = 0
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            length = len(line.rstrip("\n"))
+            if length > best:
+                best = length
+    return best
 print(longest_line("week4.py"))
 
 # 练习 B：写一个函数，把一个字典保存成文本文件（每行 键: 值）
 #
+# def save_dict(d, path):
+#     ...
+#
+# save_dict({"姓名": "迪安2026", "周数": 5}, "info.txt")
 def save_dict(d, path):
     with open(path, "w", encoding="utf-8") as f:
         for key, value in d.items():
             f.write(f"{key}: {value}\n")
-
+             
 save_dict({"姓名": "迪安2026", "周数": 5}, "info.txt")
 
 # 练习 C：写一个 Student 类
 #   属性：name, week, scores（成绩列表）
-#   方法：show() / add_score(s) / average()
-#   （已完成，核心是避开可变默认参数坑：scores=None 而不是 scores=[]）
+#   方法：
+#     show()      打印学生信息
+#     add_score(s)  添加一个成绩
+#     average()   返回平均分（没有成绩返回 0）
 #
+# class Student:
+#     def __init__(self, name, week, scores=None):
+#         ...
+#
+# s = Student("迪安2026", 5, [85, 92, 78])
+# s.show()
+# s.add_score(100)
+# print("平均分:", s.average())
+
 class Student:
     def __init__(self, name, week, scores=None):
         self.name = name
         self.week = week
-        # 每个对象拿自己的列表，绝不共享
         self.scores = scores if scores is not None else []
 
     def show(self):
@@ -300,33 +305,27 @@ print("空成绩平均分:", s2.average())      # 应该是 0
 s2.add_score(60)
 print("s1 的成绩:", s.scores)             # 应该还是 [85, 92, 78, 100]
 print("s2 的成绩:", s2.scores)            # 应该是 [60]
-
-
 # 练习 D：用正则从一段文字里提取所有日期
 #   支持 2026-10-26 和 2026/10/26 两种格式
-#   关键点：用反向引用 \2 保证前后分隔符是同一种，排除 2026-10/26 这种混搭
-#   又因为 findall 在正则含分组时只返回分组内容，所以整体要再套一层捕获
 #
+# def find_dates(text):
+#     ...
+#
+# print(find_dates("会议在2026-10-26，下次2026/11/02"))
+# # 期望 ['2026-10-26', '2026/11/02']
+import re
+
 def find_dates(text):
-    """提取 YYYY-MM-DD 或 YYYY/MM/DD，返回完整日期字符串列表
-
-    正则说明：
-      (\\d{4}([-/])\\d{2}\\2\\d{2})  外层括号：让 findall 返回完整匹配
-      ([-/])                     内层捕获组：记住第一个分隔符
-      \\2                        反向引用：第二个分隔符必须和第一个相同
-    """
-    return re.findall(r"(\d{4}([-/])\d{2}\2\d{2})", text)
-
+    return [m.group(0) for m in re.finditer(r"\d{4}([-/])\d{2}\1\d{2}", text)]
 print(find_dates("会议在2026-10-26，下次2026/11/02"))
-# 期望 ['2026-10-26', '2026/11/02']
-print(find_dates("混搭格式 2026-10/26 不该被匹配"))
-# 期望 []
 
 
 # 练习 E：综合 —— 日志分析器
 #   读取一个日志文件，用正则提取所有 ERROR 级别的行，
 #   统计每种错误出现的次数，输出前 3 个最多的
 #
+# def analyze_log(path):
+#     ...
 log_text = """2026-10-27 09:00:12 INFO  程序启动
 2026-10-27 09:00:15 ERROR 数据库连接失败
 2026-10-27 09:01:02 INFO  重试中
@@ -339,33 +338,23 @@ log_text = """2026-10-27 09:00:12 INFO  程序启动
 with open("test.log", "w", encoding="utf-8") as f:
     f.write(log_text)
 
+import re
 
 def analyze_log(path):
-    """统计日志里 ERROR 行，按出现次数从多到少打印前 3 名，返回计数字典"""
     counter = {}
 
-    try:
-        with open(path, encoding="utf-8") as f:
-            for line in f:
-                # \bERROR\b 保证 ERROR 是独立单词（不会误配 ERROR_CODE）
-                # \s+ 跳过级别后的空格，(.+?) 非贪婪，\s*$ 吃掉行尾空白
-                m = re.search(r"\bERROR\b\s+(.+?)\s*$", line)
-                if m:
-                    msg = m.group(1)
-                    counter[msg] = counter.get(msg, 0) + 1
-    except FileNotFoundError:
-        print(f"找不到文件: {path}")
-        return counter
-    except UnicodeDecodeError:
-        print(f"{path} 不是 UTF-8 编码")
-        return counter
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            m = re.search(r"ERROR\s+(.+)", line)
+            if m:
+                msg = m.group(1).strip()
+                counter[msg] = counter.get(msg, 0) + 1
 
     if not counter:
         print("没有找到 ERROR 级别的日志")
         return counter
 
-    # 排序：先按次数降序，次数相同再按消息字典序，保证结果稳定
-    ranked = sorted(counter.items(), key=lambda kv: (-kv[1], kv[0]))
+    ranked = sorted(counter.items(), key=lambda kv: kv[1], reverse=True)
 
     print(f"共 {sum(counter.values())} 条 ERROR，{len(counter)} 种")
     for msg, count in ranked[:3]:
@@ -375,5 +364,3 @@ def analyze_log(path):
 
 
 analyze_log("test.log")
-# 顺手验一下文件不存在的情况不会崩
-analyze_log("不存在.log")
