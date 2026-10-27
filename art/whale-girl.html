@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>色块画 · 鲸鱼娘</title>
+<style>
+  :root{
+    --deep:   #0a1b3d;
+    --deep2:  #12294f;
+    --sea:    #1e4d7b;
+    --sea2:   #2f6ea3;
+    --hair:   #58a6d6;
+    --hair2:  #3d7fb0;
+    --hair3:  #2b6390;
+    --belly:  #e8f6fb;
+    --skin:   #ffe3d4;
+    --eye:    #17324f;
+    --blush:  #ff9fb2;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background:#07122a;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+    font-family:"Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  /* 画框：坐标原点统一在这里，内部全部用 left/top 绝对定位 */
+  .frame{
+    position:relative;
+    width:800px; height:600px;
+    background:linear-gradient(180deg, var(--deep) 0%, var(--deep2) 36%, var(--sea) 64%, var(--sea2) 100%);
+    overflow:hidden;
+    border-radius:10px;
+    box-shadow:0 24px 70px rgba(0,0,0,.65);
+  }
+
+  /* ---------- 光柱 ---------- */
+  .ray{
+    position:absolute; top:-40px;
+    background:linear-gradient(180deg, rgba(190,235,255,.15), rgba(190,235,255,0));
+    transform-origin:top center;
+    transform:rotate(var(--r,0deg));
+  }
+
+  /* ---------- 气泡 ---------- */
+  .bubble{
+    position:absolute; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(160,220,245,.22) 58%, rgba(120,190,230,.04));
+    border:1px solid rgba(210,245,255,.45);
+    animation:rise linear infinite;
+  }
+  @keyframes rise{
+    0%   { transform:translateY(0); opacity:0; }
+    15%  { opacity:1; }
+    85%  { opacity:1; }
+    100% { transform:translateY(-260px) translateX(12px); opacity:0; }
+  }
+
+  /* =========================================================
+     鲸鱼娘（所有部件直接挂在 .frame 下，坐标即画面坐标）
+     ========================================================= */
+
+  /* 尾巴两片 */
+  .fluke{
+    position:absolute; left:96px; top:300px;
+    width:130px; height:80px;
+    background:var(--hair2);
+    border-radius:66% 6% 66% 6%;
+    transform-origin:right center;
+    animation:tail 3.6s ease-in-out infinite;
+  }
+  .fluke2{
+    position:absolute; left:104px; top:352px;
+    width:118px; height:74px;
+    background:var(--hair3);
+    border-radius:6% 66% 6% 66%;
+    transform-origin:right center;
+    animation:tail 3.6s ease-in-out infinite;
+    animation-delay:.12s;
+  }
+  @keyframes tail{
+    0%,100%{ transform:rotate(-14deg); }
+    50%    { transform:rotate(-7deg); }
+  }
+
+  /* 身体 */
+  .w-body{
+    position:absolute; left:186px; top:252px;
+    width:400px; height:190px;
+    background:var(--hair);
+    border-radius:70% 30% 46% 54% / 72% 64% 36% 28%;
+  }
+  .belly{
+    position:absolute; left:240px; top:348px;
+    width:300px; height:92px;
+    background:var(--belly);
+    border-radius:54% 46% 48% 48% / 70% 66% 30% 26%;
+  }
+  .shine{
+    position:absolute; left:246px; top:274px;
+    width:146px; height:30px;
+    background:rgba(255,255,255,.2);
+    border-radius:50%;
+    transform:rotate(-7deg);
+  }
+
+  /* 前鳍：贴着身体下缘，稍微探出去一点 */
+  .fin{
+    position:absolute; left:400px; top:360px;
+    width:120px; height:86px;
+    background:var(--hair2);
+    border-radius:60% 40% 55% 45% / 26% 44% 56% 74%;
+    transform:rotate(10deg);
+  }
+
+  /* 头 */
+  .w-head{
+    position:absolute; left:466px; top:150px;
+    width:238px; height:214px;
+    background:var(--hair);
+    border-radius:50% 50% 46% 46% / 56% 56% 44% 44%;
+  }
+  /* 头发帘：只盖头顶 */
+  .fringe{
+    position:absolute; left:454px; top:140px;
+    width:258px; height:86px;
+    background:linear-gradient(180deg, var(--hair2), var(--hair));
+    border-radius:50% 50% 48% 52% / 82% 82% 18% 22%;
+  }
+  /* 侧发：从左颊垂下来 */
+  .sidehair{
+    position:absolute; left:440px; top:186px;
+    width:46px; height:112px;
+    background:var(--hair2);
+    border-radius:50% 40% 60% 48% / 40% 46% 54% 60%;
+    transform:rotate(6deg);
+  }
+  /* 挑染 */
+  .streak{
+    position:absolute; left:576px; top:158px;
+    width:22px; height:56px;
+    background:rgba(255,255,255,.3);
+    border-radius:60% 40% 50% 50%;
+    transform:rotate(16deg);
+  }
+
+  /* 脸（压在头发下面） */
+  .face{
+    position:absolute; left:492px; top:224px;
+    width:182px; height:128px;
+    background:var(--skin);
+    border-radius:50% 50% 48% 48% / 54% 54% 46% 46%;
+  }
+
+  /* 眼睛（闭眼笑）——在 .face 之外定义，坐标基于画面，需手动对齐 */
+  .eye{
+    position:absolute; width:28px; height:10px;
+    border-bottom:5px solid var(--eye);
+    border-radius:0 0 60% 60%;
+  }
+  .eye.l{ left:524px; top:274px; }
+  .eye.r{ left:604px; top:274px; }
+
+  .blush{
+    position:absolute; width:32px; height:16px;
+    background:var(--blush); border-radius:50%;
+    opacity:.62; filter:blur(1.4px);
+  }
+  .blush.l{ left:506px; top:296px; }
+  .blush.r{ left:626px; top:296px; }
+
+  .mouth{
+    position:absolute; left:570px; top:298px;
+    width:22px; height:11px;
+    border-bottom:3px solid #c06866;
+    border-radius:0 0 50% 50%;
+  }
+
+  /* 喷水孔 + 水柱 */
+  .blowhole{
+    position:absolute; left:560px; top:154px;
+    width:22px; height:9px;
+    background:var(--hair3);
+    border-radius:50%;
+  }
+  .spout{
+    position:absolute; left:568px; top:100px;
+    width:5px; height:56px;
+    background:linear-gradient(180deg, rgba(190,240,255,0), #a8e0f5);
+    border-radius:3px;
+    animation:spout 2.8s ease-in-out infinite;
+  }
+  @keyframes spout{
+    0%,100%{ transform:scaleY(.5); opacity:.2; }
+    45%    { transform:scaleY(1);  opacity:.9; }
+  }
+
+  /* ---------- 海床 ---------- */
+  .seabed{
+    position:absolute; left:0; bottom:0; width:100%; height:86px;
+    background:linear-gradient(180deg, #0b2a44, #061a2b);
+    border-radius:54% 46% 0 0 / 30% 26% 0 0;
+  }
+  .weed{
+    position:absolute; bottom:60px;
+    background:linear-gradient(180deg, #1d6b5a, #0d3b33);
+    border-radius:60% 60% 0 0;
+    transform-origin:bottom center;
+    animation:sway 4.5s ease-in-out infinite;
+  }
+  @keyframes sway{
+    0%,100%{ transform:rotate(-4deg); }
+    50%    { transform:rotate(5deg); }
+  }
+
+  .caption{
+    position:absolute; left:0; bottom:14px; width:100%;
+    text-align:center; color:#a9d8ee;
+    font-size:13px; letter-spacing:.22em; opacity:.65;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- 水下光柱 -->
+  <div class="ray" style="left:96px;  width:70px; height:520px; --r:-14deg;"></div>
+  <div class="ray" style="left:252px; width:38px; height:470px; --r:-6deg;"></div>
+  <div class="ray" style="left:474px; width:96px; height:560px; --r:9deg;"></div>
+  <div class="ray" style="left:646px; width:44px; height:500px; --r:16deg;"></div>
+
+  <!-- 气泡 -->
+  <div class="bubble" style="left:110px; bottom:120px; width:16px; height:16px; animation-duration:9s;  animation-delay:0s;"></div>
+  <div class="bubble" style="left:186px; bottom:88px;  width:9px;  height:9px;  animation-duration:7s;  animation-delay:1.4s;"></div>
+  <div class="bubble" style="left:706px; bottom:150px; width:22px; height:22px; animation-duration:11s; animation-delay:.8s;"></div>
+  <div class="bubble" style="left:748px; bottom:84px;  width:12px; height:12px; animation-duration:8s;  animation-delay:2.6s;"></div>
+  <div class="bubble" style="left:404px; bottom:56px;  width:7px;  height:7px;  animation-duration:6s;  animation-delay:3.4s;"></div>
+  <div class="bubble" style="left:150px; bottom:300px; width:14px; height:14px; animation-duration:10s; animation-delay:1.9s;"></div>
+
+  <!-- 鲸鱼娘：从后往前叠 -->
+  <div class="fluke2"></div>
+  <div class="fluke"></div>
+
+  <div class="w-body"></div>
+  <div class="belly"></div>
+  <div class="shine"></div>
+  <div class="fin"></div>
+
+  <div class="w-head"></div>
+  <div class="fringe"></div>
+  <div class="sidehair"></div>
+  <div class="streak"></div>
+
+  <div class="spout"></div>
+  <div class="blowhole"></div>
+
+  <div class="face"></div>
+  <div class="eye l"></div>
+  <div class="eye r"></div>
+  <div class="blush l"></div>
+  <div class="blush r"></div>
+  <div class="mouth"></div>
+
+  <!-- 海床 -->
+  <div class="seabed"></div>
+  <div class="weed" style="left:96px;  width:12px; height:118px; animation-delay:.4s;"></div>
+  <div class="weed" style="left:126px; width:9px;  height:86px;  animation-delay:1.2s;"></div>
+  <div class="weed" style="left:660px; width:13px; height:132px; animation-delay:.9s;"></div>
+  <div class="weed" style="left:690px; width:8px;  height:92px;  animation-delay:1.8s;"></div>
+
+  <div class="caption">CETACEA_LOLI</div>
+</div>
+
+</body>
+</html>
