@@ -16,3 +16,17 @@ Thumbs.db
 # 鲸鱼娘的日记（私密，不公开）
 鲸鱼娘日记.md
 鲸鱼娘日记*.md
+
+# 学习脚本跑出来的临时产物（可随时重新生成，不进仓库）
+sample.txt
+output.txt
+output2.txt
+data.csv
+info.txt
+test.log
+
+# 备份文件
+*.bak
+
+# DSH 权限修复报告
+.acl-recovery/
