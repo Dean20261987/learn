@@ -182,7 +182,7 @@ print(f"跳过的无效项: {skipped}")
 # 然后用它打印 1-20 里所有偶数
 #
 def is_even(n):
-    return n%2 == 0
+    return n % 2 == 0
 
 for i in range(1, 21):
     if is_even(i):
@@ -202,7 +202,7 @@ print(count_words("我爱 学习 编程"))    # 应该输出 3
 # 
 def safe_divide(a, b):
     try:
-      return a/b
+        return a / b
     except ZeroDivisionError:
         return None
 print(safe_divide(10, 2))    # 5.0
@@ -229,7 +229,14 @@ print(word_freq("我 爱 吃 饭 饭 饭"))
 #
 
 def analyze_file(path):
-    """统计文件的总行数、空行数、注释行数"""
+    """
+    统计文件的总行数、空行数、注释行数、代码行数
+
+    - 空行：去掉前后空白后什么都不剩的行
+    - 注释行：去掉前导空白后以 # 开头的行（行尾注释算代码行，不算注释行）
+    - 三引号文档字符串不算注释行，算代码行
+    成功返回字典，失败返回 None
+    """
     total = 0
     blank = 0
     comment = 0
@@ -246,6 +253,15 @@ def analyze_file(path):
     except FileNotFoundError:
         print(f"找不到文件: {path}")
         return None
+    except IsADirectoryError:
+        print(f"{path} 是文件夹，不是文件")
+        return None
+    except PermissionError:
+        print(f"没有权限读取: {path}")
+        return None
+    except UnicodeDecodeError:
+        print(f"{path} 不是 UTF-8 编码，读不了")
+        return None
 
     code = total - blank - comment
 
@@ -255,7 +271,14 @@ def analyze_file(path):
     print(f"  注释:   {comment}")
     print(f"  代码行: {code}")
 
-    return total, blank, comment
+    return {"total": total, "blank": blank, "comment": comment, "code": code}
 
 
-analyze_file(r"D:\Programs\learn\week3.py")
+# 直接运行本文件时才执行；路径不写死，可以用命令行参数传
+if __name__ == "__main__":
+    import sys
+
+    target = sys.argv[1] if len(sys.argv) > 1 else "week3.py"
+    result = analyze_file(target)
+    if result is not None:
+        print("返回的字典:", result)
