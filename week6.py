@@ -203,16 +203,17 @@ print("\n=== 10. 一个能长大的项目长什么样 ===")
 #
 # --- tools.py 骨架 ---
 # def count_words(text):
-#     ...
+#     return len(text.split())
 #
 # def is_palindrome(s):
-#     ...
+#     lower_s = s.lower()
+#     return lower_s == lower_s[::-1]
 #
 # --- week6.py 里这样验证 ---
-# from tools import count_words, is_palindrome
-# print(count_words("hello world from python"))   # 期望 4
-# print(is_palindrome("Level"))                   # 期望 True
-# print(is_palindrome("鲸鱼娘"))                   # 期望 True
+from tools import count_words, is_palindrome
+print(count_words("hello world from python"))   # 期望 4
+print(is_palindrome("Level"))                   # 期望 True
+print(is_palindrome("鲸鱼娘"))                   # 期望 false
 #
 # 提示：判断回文可以先把字符串转小写，再和它的反序比较（s[::-1] 是切片反转）。
 
@@ -234,23 +235,28 @@ print("\n=== 10. 一个能长大的项目长什么样 ===")
 #   └── numx.py     写 is_even(n)，偶数返回 True
 #
 #   然后从包里导入使用：
-# from mytools.textx import shout
-# from mytools import numx
-# print(shout("hello"))       # 期望 HELLO!
-# print(numx.is_even(6))      # 期望 True
+from mytools.textx import shout
+from mytools import numx
+print(shout("hello"))       # 期望 HELLO!
+print(numx.is_even(6))      # 期望 True
 
 
 # 练习 D：用 json 把字典存成文件再读回来
-#   写两个函数：
-#     save_notes(notes, path)   用 json.dump 存，ensure_ascii=False
-#     load_notes(path)          用 json.load 读；文件不存在时返回 {}
-#   验证：
-#     save_notes({"2026-10-28": "开第 6 周"}, "notes.json")
-#     print(load_notes("notes.json"))         # 期望是 dict，里面有内容
-#     print(load_notes("没有这个文件.json"))   # 期望 {}
-#
-# 提示：文件不存在会抛 FileNotFoundError，用 try/except 接住它。
+def save_notes(notes, path):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(notes, f, ensure_ascii=False, indent=2)
 
+def load_notes(path):
+    """读 JSON 文件；文件不存在时返回 {}"""
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+save_notes({"2026-10-28": "开第 6 周"}, "notes.json")
+print(load_notes("notes.json"))          # 期望 {'2026-10-28': '开第 6 周'}
+print(load_notes("没有这个文件.json"))    # 期望 {}
 
 # 练习 E：综合 —— 把第 5 周的日志分析器模块化
 #   1. 新建 mypkg/logstat.py
@@ -258,10 +264,10 @@ print("\n=== 10. 一个能长大的项目长什么样 ===")
 #      返回值形如 {"数据库连接失败": 3, "文件不存在": 1, ...}
 #   3. 在 logstat.py 最底下加 if __name__ == "__main__": 自测
 #   4. 回到 week6.py：
-# from mypkg.logstat import analyze_log
-# result = analyze_log("test.log")
-# print(result)
-#
+from mypkg.logstat import analyze_log
+result = analyze_log("test.log")
+print(result)
+
 # 这题的意思是：一个函数从"只在一处用的小脚本"升级成"能被到处 import 的工具"，
 # 要做的就是把 print 换成 return，再加 __main__ 自测。
 
