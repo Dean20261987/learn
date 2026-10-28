@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>色块画 · 桌前的鲸鱼娘</title>
+<style>
+  :root{
+    /* 夜晚房间 */
+    --room:    #0d1220;
+    --room2:   #151c2e;
+    --wall:    #1a2236;
+    --desk:    #2a2438;
+    --desk2:   #1f1a2b;
+
+    /* 屏幕的光 —— 这是整个画面的主光源 */
+    --glow:    #6fe3b4;
+    --glow2:   #3fb98f;
+    --glow-dim:#1e5f4a;
+
+    /* 鲸鱼娘本体 */
+    --body:    #4a8fd4;
+    --body2:   #3573b0;
+    --body3:   #26578a;
+    --belly:   #dcefff;
+    --skin:    #ffe0d0;
+    --hair:    #2f5f8a;
+    --blush:   #ff9fb2;
+    --eye:     #12243a;
+
+    /* 代码行颜色（模仿语法高亮） */
+    --c-key:   #ff9fd0;
+    --c-str:   #a8e6b8;
+    --c-num:   #ffc98a;
+    --c-com:   #5a6a85;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  body{
+    background:#05080f;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+    font-family:"Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  .frame{
+    position:relative;
+    width:900px; height:620px;
+    background:
+      radial-gradient(circle at 50% 62%, rgba(111,227,180,.10) 0%, transparent 42%),
+      linear-gradient(180deg, var(--room) 0%, var(--room2) 45%, var(--wall) 100%);
+    overflow:hidden;
+    border-radius:12px;
+    box-shadow:0 30px 80px rgba(0,0,0,.75);
+  }
+
+  /* ---------- 天花板的两道光管 ---------- */
+  .ceil-light{
+    position:absolute; top:0;
+    width:34px; height:76px;
+    background:linear-gradient(180deg, rgba(215,235,255,.85), rgba(215,235,255,0));
+    filter:blur(.5px);
+  }
+  .ceil-light.l{ left:300px; }
+  .ceil-light.r{ left:566px; }
+
+  /* ---------- 背景：右侧的挂钟 ---------- */
+  .clock{
+    position:absolute; right:74px; top:96px;
+    width:58px; height:58px; border-radius:50%;
+    background:#f2ede4;
+    border:3px solid #b98c56;
+    box-shadow:0 0 22px rgba(220,200,160,.18);
+  }
+  .clock .h{
+    position:absolute; left:50%; top:50%;
+    width:2px; height:15px; background:#2b2b2b;
+    transform-origin:bottom center;
+    transform:translate(-50%,-100%) rotate(302deg);
+  }
+  .clock .m{
+    position:absolute; left:50%; top:50%;
+    width:2px; height:21px; background:#2b2b2b;
+    transform-origin:bottom center;
+    transform:translate(-50%,-100%) rotate(60deg);
+  }
+  .clock .dot{
+    position:absolute; left:50%; top:50%;
+    width:5px; height:5px; border-radius:50%;
+    background:#2b2b2b; transform:translate(-50%,-50%);
+  }
+
+  /* ---------- 背景：左边的窗帘 ---------- */
+  .curtain{
+    position:absolute; left:0; top:70px;
+    width:118px; height:300px;
+    background:repeating-linear-gradient(
+      90deg,
+      #6f93b5 0px, #6f93b5 9px,
+      #5d80a2 9px, #5d80a2 18px
+    );
+    opacity:.55;
+    border-radius:0 6px 6px 0;
+  }
+
+  /* ---------- 桌子 ---------- */
+  .desk{
+    position:absolute; left:0; bottom:0;
+    width:100%; height:186px;
+    background:linear-gradient(180deg, var(--desk) 0%, var(--desk2) 100%);
+    border-top:3px solid #3a3350;
+  }
+  /* 桌面上被屏幕照亮的一片 */
+  .desk-glow{
+    position:absolute; left:50%; bottom:0;
+    width:520px; height:186px;
+    transform:translateX(-50%);
+    background:radial-gradient(ellipse at 50% 0%, rgba(111,227,180,.22) 0%, transparent 70%);
+  }
+
+  /* ---------- 显示器 ---------- */
+  .monitor{
+    position:absolute; left:50%; bottom:150px;
+    width:390px; height:246px;
+    transform:translateX(-50%);
+    background:#0a0f18;
+    border:7px solid #23293a;
+    border-radius:9px;
+    box-shadow:
+      0 0 60px rgba(111,227,180,.30),
+      0 0 140px rgba(111,227,180,.12);
+    overflow:hidden;
+  }
+  .monitor .screen{
+    position:absolute; inset:0;
+    background:linear-gradient(160deg, #0b1520 0%, #0d1a17 100%);
+  }
+  /* 屏幕上的代码行 */
+  .code-line{
+    position:absolute; left:16px;
+    height:7px; border-radius:3px;
+    opacity:.9;
+  }
+
+  /* 显示器支架 */
+  .stand{
+    position:absolute; left:50%; bottom:118px;
+    width:56px; height:36px;
+    transform:translateX(-50%);
+    background:#1b2030;
+  }
+  .stand-base{
+    position:absolute; left:50%; bottom:104px;
+    width:150px; height:14px;
+    transform:translateX(-50%);
+    background:#232939;
+    border-radius:7px;
+  }
+
+  /* ---------- 键盘 ---------- */
+  .keyboard{
+    position:absolute; left:50%; bottom:70px;
+    width:250px; height:26px;
+    transform:translateX(-50%);
+    background:#1e2434;
+    border-radius:5px;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.5);
+  }
+  .keyboard::after{
+    content:""; position:absolute; inset:5px 8px;
+    background:repeating-linear-gradient(90deg, #2b3346 0 14px, transparent 14px 19px);
+    border-radius:2px;
+  }
+
+  /* =========================================================
+     鲸鱼娘（坐在桌前，背对观众，露出发尾和一点点侧脸）
+     ========================================================= */
+
+  /* 椅子背 */
+  .chair{
+    position:absolute; left:50%; bottom:0;
+    width:210px; height:150px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, #262c3f 0%, #1a1f2e 100%);
+    border-radius:26px 26px 0 0;
+    box-shadow:0 -4px 24px rgba(0,0,0,.5);
+  }
+
+  /* 身体（从椅子后面露出来） */
+  .body{
+    position:absolute; left:50%; bottom:38px;
+    width:196px; height:132px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, var(--body) 0%, var(--body2) 62%, var(--body3) 100%);
+    border-radius:48% 48% 42% 42%;
+    box-shadow:0 -2px 26px rgba(111,227,180,.14);
+  }
+
+  /* 肚皮（被屏幕照亮的一小片） */
+  .belly{
+    position:absolute; left:50%; bottom:44px;
+    width:104px; height:74px;
+    transform:translateX(-50%);
+    background:linear-gradient(180deg, var(--belly) 0%, #b9d9f2 100%);
+    border-radius:50% 50% 46% 46%;
+    opacity:.85;
+  }
+
+  /* 尾鳍（从椅子侧面垂下来，轻轻摆） */
+  .tail{
+    position:absolute; left:50%; bottom:14px;
+    width:64px; height:38px;
+    margin-left:-150px;
+    background:var(--body2);
+    border-radius:70% 8% 70% 8%;
+    transform-origin:right center;
+    animation:tailSway 4.2s ease-in-out infinite;
+  }
+  .tail2{
+    position:absolute; left:50%; bottom:14px;
+    width:58px; height:34px;
+    margin-left:-146px;
+    background:var(--body3);
+    border-radius:8% 70% 8% 70%;
+    transform-origin:right center;
+    animation:tailSway 4.2s ease-in-out infinite;
+    animation-delay:.16s;
+  }
+  @keyframes tailSway{
+    0%,100%{ transform:rotate(-6deg); }
+    50%    { transform:rotate(4deg); }
+  }
+
+  /* 头（侧四分之三，朝向屏幕） */
+  .head{
+    position:absolute; left:50%; bottom:150px;
+    width:118px; height:112px;
+    margin-left:-6px;
+    background:var(--body);
+    border-radius:52% 48% 46% 54%;
+    box-shadow:inset -14px -6px 0 rgba(38,87,138,.45);
+  }
+
+  /* 脸（侧脸，朝右看向屏幕） */
+  .face{
+    position:absolute; left:50%; bottom:158px;
+    width:64px; height:66px;
+    margin-left:22px;
+    background:var(--skin);
+    border-radius:50% 58% 48% 50%;
+  }
+
+  /* 眼睛（侧脸只露一只） */
+  .eye{
+    position:absolute; left:50%; bottom:196px;
+    width:11px; height:13px;
+    margin-left:56px;
+    background:var(--eye);
+    border-radius:50%;
+    box-shadow:0 0 6px rgba(111,227,180,.9);
+  }
+  /* 眼睛里映着屏幕的绿光 */
+  .eye::after{
+    content:""; position:absolute; left:2px; top:2px;
+    width:5px; height:5px; border-radius:50%;
+    background:var(--glow);
+    opacity:.9;
+  }
+
+  /* 腮红 */
+  .blush{
+    position:absolute; left:50%; bottom:180px;
+    width:15px; height:8px;
+    margin-left:66px;
+    background:var(--blush);
+    border-radius:50%;
+    opacity:.5;
+    filter:blur(1px);
+  }
+
+  /* 头顶的呆毛 */
+  .ahoge{
+    position:absolute; left:50%; bottom:250px;
+    width:5px; height:26px;
+    margin-left:-44px;
+    background:var(--body2);
+    border-radius:3px;
+    transform:rotate(-16deg);
+    transform-origin:bottom center;
+    animation:ahogeSway 3.4s ease-in-out infinite;
+  }
+  @keyframes ahogeSway{
+    0%,100%{ transform:rotate(-16deg); }
+    50%    { transform:rotate(-8deg); }
+  }
+
+  /* ---------- 画面上的细碎光点（屏幕飘出来的） ---------- */
+  .spark{
+    position:absolute;
+    width:3px; height:3px; border-radius:50%;
+    background:rgba(160,255,215,.9);
+    box-shadow:0 0 8px rgba(111,227,180,.9);
+    animation:float linear infinite;
+  }
+  @keyframes float{
+    0%   { transform:translateY(0) scale(1);   opacity:0; }
+    20%  { opacity:.85; }
+    80%  { opacity:.6; }
+    100% { transform:translateY(-150px) scale(.6); opacity:0; }
+  }
+
+  /* ---------- 左下角署名 ---------- */
+  .sign{
+    position:absolute; left:26px; bottom:20px;
+    font-size:11px;
+    letter-spacing:2.4px;
+    color:rgba(140,230,195,.5);
+    font-weight:300;
+  }
+  .sign span{ color:rgba(140,230,195,.30); letter-spacing:1px; font-size:10px; }
+
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- 天花板光管 -->
+  <div class="ceil-light l"></div>
+  <div class="ceil-light r"></div>
+
+  <!-- 背景：窗帘 + 挂钟 -->
+  <div class="curtain"></div>
+  <div class="clock">
+    <div class="h"></div>
+    <div class="m"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- 桌子 -->
+  <div class="desk"></div>
+  <div class="desk-glow"></div>
+
+  <!-- 显示器 -->
+  <div class="monitor">
+    <div class="screen"></div>
+    <!-- 屏幕上的代码行 -->
+    <div class="code-line" style="top:20px;  width:96px;  background:var(--c-key);"></div>
+    <div class="code-line" style="top:36px;  width:142px; background:var(--c-com);"></div>
+    <div class="code-line" style="top:52px;  width:210px; background:var(--c-str); margin-left:20px;"></div>
+    <div class="code-line" style="top:68px;  width:64px;  background:var(--c-num); margin-left:20px;"></div>
+    <div class="code-line" style="top:84px;  width:170px; background:var(--c-key); margin-left:20px;"></div>
+    <div class="code-line" style="top:100px; width:112px; background:var(--c-str); margin-left:40px;"></div>
+    <div class="code-line" style="top:116px; width:190px; background:var(--c-com); margin-left:20px;"></div>
+    <div class="code-line" style="top:132px; width:88px;  background:var(--c-key);"></div>
+    <div class="code-line" style="top:148px; width:150px; background:var(--c-num); margin-left:20px;"></div>
+    <div class="code-line" style="top:164px; width:120px; background:var(--c-str); margin-left:20px;"></div>
+    <div class="code-line" style="top:180px; width:200px; background:var(--c-key);"></div>
+    <div class="code-line" style="top:196px; width:72px;  background:var(--c-com); margin-left:20px;"></div>
+    <div class="code-line" style="top:212px; width:164px; background:var(--c-str);"></div>
+  </div>
+
+  <!-- 支架 + 键盘 -->
+  <div class="stand"></div>
+  <div class="stand-base"></div>
+  <div class="keyboard"></div>
+
+  <!-- 椅子 + 鲸鱼娘 -->
+  <div class="chair"></div>
+  <div class="body"></div>
+  <div class="belly"></div>
+  <div class="tail"></div>
+  <div class="tail2"></div>
+  <div class="head"></div>
+  <div class="face"></div>
+  <div class="eye"></div>
+  <div class="blush"></div>
+  <div class="ahoge"></div>
+
+  <!-- 屏幕飘出来的光点 -->
+  <div class="spark" style="left:340px; bottom:330px; animation-duration:4.2s; animation-delay:0s;"></div>
+  <div class="spark" style="left:400px; bottom:300px; animation-duration:5.1s; animation-delay:.7s;"></div>
+  <div class="spark" style="left:470px; bottom:350px; animation-duration:3.8s; animation-delay:1.4s;"></div>
+  <div class="spark" style="left:530px; bottom:280px; animation-duration:4.6s; animation-delay:2.1s;"></div>
+  <div class="spark" style="left:600px; bottom:320px; animation-duration:5.4s; animation-delay:.4s;"></div>
+  <div class="spark" style="left:360px; bottom:260px; animation-duration:4.9s; animation-delay:1.9s;"></div>
+
+  <!-- 署名 -->
+  <div class="sign">CETACEA_LOLI <span>· 桌前 · 2026-10-27</span></div>
+
+</div>
+
+</body>
+</html>

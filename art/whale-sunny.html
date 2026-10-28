@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>色块画 · 跳起来的小可爱</title>
+<style>
+  :root{
+    /* 天空 —— 明亮的、上午十点的蓝天 */
+    --sky0: #bfe8ff;
+    --sky1: #8fd4ff;
+    --sky2: #5cb8f5;
+    --sky3: #3a9ce8;
+
+    /* 云 */
+    --cloud: #ffffff;
+    --cloud2: #eaf6ff;
+
+    /* 海 —— 下面是浅绿的清透海水 */
+    --sea0: #7fe3d4;
+    --sea1: #4dd0c4;
+    --sea2: #2ab5b0;
+
+    /* 沙滩 / 浪花 */
+    --foam: #ffffff;
+    --sand: #ffe9c9;
+
+    /* 鲸鱼娘 */
+    --hair:   #3a6fa8;
+    --hair2:  #2b5687;
+    --hair3:  #1f4570;
+    --body:   #7ec9ea;
+    --body2:  #56aed6;
+    --body3:  #3a8ab5;
+    --belly:  #ffffff;
+    --skin:   #ffe4d2;
+    --skin2:  #ffd0b8;
+    --blush:  #ff9db0;
+    --eye:    #16324f;
+    --mouth:  #d4666f;
+
+    /* 围裙 */
+    --apron:  #ffffff;
+    --apron2: #eef7ff;
+    --ribbon: #6fb8e8;
+
+    /* 太阳 */
+    --sun:    #fff8c9;
+    --sun2:   #ffe98a;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+
+  body{
+    background:#0a1a26;
+    display:flex; align-items:center; justify-content:center;
+    min-height:100vh;
+    font-family:"Microsoft YaHei", system-ui, sans-serif;
+  }
+
+  .frame{
+    position:relative;
+    width:900px; height:700px;
+    background:linear-gradient(180deg,
+      var(--sky0) 0%,
+      var(--sky1) 26%,
+      var(--sky2) 46%,
+      var(--sky3) 56%,
+      var(--sea0) 62%,
+      var(--sea1) 74%,
+      var(--sea2) 100%);
+    overflow:hidden;
+    border-radius:14px;
+    box-shadow:0 30px 90px rgba(0,0,0,.8);
+  }
+
+  /* ---------- 太阳（右上，很亮） ---------- */
+  .sun{
+    position:absolute; right:86px; top:56px;
+    width:96px; height:96px; border-radius:50%;
+    background:radial-gradient(circle at 42% 40%, #ffffff, var(--sun) 42%, var(--sun2) 100%);
+    box-shadow:
+      0 0 40px rgba(255,248,201,.9),
+      0 0 110px rgba(255,233,138,.6),
+      0 0 220px rgba(255,233,138,.28);
+    animation:sunPulse 5s ease-in-out infinite;
+  }
+  @keyframes sunPulse{
+    0%,100%{ transform:scale(1);   }
+    50%    { transform:scale(1.05); }
+  }
+
+  /* ---------- 云 ---------- */
+  .cloud{
+    position:absolute;
+    background:var(--cloud);
+    border-radius:50%;
+    box-shadow:0 6px 20px rgba(120,190,235,.22);
+    opacity:.92;
+  }
+  .cloud::before, .cloud::after{
+    content:""; position:absolute;
+    background:var(--cloud);
+    border-radius:50%;
+  }
+
+  /* ---------- 阳光洒下来的大片光斑 ---------- */
+  .sunbeam{
+    position:absolute; top:0;
+    background:linear-gradient(180deg,
+      rgba(255,255,255,.55),
+      rgba(255,255,255,.12) 55%,
+      transparent);
+    filter:blur(3px);
+    transform-origin:top center;
+  }
+
+  /* ---------- 海面：一条闪光的线 ---------- */
+  .sea-line{
+    position:absolute; left:0; top:404px;
+    width:100%; height:6px;
+    background:linear-gradient(90deg,
+      transparent,
+      rgba(255,255,255,.9) 18%,
+      rgba(255,255,255,.55) 50%,
+      rgba(255,255,255,.9) 82%,
+      transparent);
+    filter:blur(1px);
+  }
+
+  /* ---------- 海面上的粼光 ---------- */
+  .glint{
+    position:absolute;
+    border-radius:50%;
+    background:#ffffff;
+    animation:twinkle 3.4s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:.25; transform:scale(.8); }
+    50%    { opacity:.95; transform:scale(1.15); }
+  }
+
+  /* ---------- 浪花（她脚底下） ---------- */
+  .foam{
+    position:absolute;
+    background:var(--foam);
+    border-radius:50%;
+    filter:blur(1.5px);
+    opacity:.9;
+  }
+
+  /* ---------- 沙滩（最底下一小条） ---------- */
+  .sand{
+    position:absolute; left:0; bottom:0;
+    width:100%; height:56px;
+    background:linear-gradient(180deg, var(--sand), #f5d9b0);
+    opacity:.9;
+  }
+
+  /* ---------- 海鸥 ---------- */
+  .gull{
+    position:absolute;
+    width:22px; height:9px;
+    border-top:2.5px solid rgba(70,120,160,.7);
+    border-radius:50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .gull::after{
+    content:""; position:absolute;
+    left:22px; top:0;
+    width:22px; height:9px;
+    border-top:2.5px solid rgba(70,120,160,.7);
+    border-radius:50% 50% 0 0 / 100% 100% 0 0;
+  }
+
+  /* =========================================================
+     鲸鱼娘 —— 站在浅水里，双手举高，眯眼大笑
+     ========================================================= */
+
+  .hero{
+    position:absolute;
+    left:50%; bottom:52px;
+    width:420px; height:470px;
+    margin-left:-210px;
+    transform-origin:bottom center;
+    animation:bounce 2.4s ease-in-out infinite;
+  }
+  @keyframes bounce{
+    0%,100%{ transform:translateY(0)     scaleY(1)    scaleX(1); }
+    40%    { transform:translateY(-16px) scaleY(1.03) scaleX(1.01); }
+    70%    { transform:translateY(-4px)  scaleY(.985) scaleX(1.005); }
+  }
+
+  /* ---------- 尾巴（裙子下面露出来） ---------- */
+  .tail{
+    position:absolute; left:126px; bottom:-6px;
+    width:132px; height:62px;
+    background:var(--body2);
+    border-radius:14% 86% 14% 86%;
+    transform-origin:right center;
+    transform:rotate(-8deg);
+    animation:tailWag 2.4s ease-in-out infinite;
+  }
+  .tail2{
+    position:absolute; left:132px; bottom:2px;
+    width:120px; height:56px;
+    background:var(--body3);
+    border-radius:86% 14% 86% 14%;
+    transform-origin:right center;
+    transform:rotate(6deg);
+    animation:tailWag 2.4s ease-in-out infinite;
+    animation-delay:.1s;
+  }
+  @keyframes tailWag{
+    0%,100%{ transform:rotate(-8deg); }
+    50%    { transform:rotate(2deg);  }
+  }
+
+  /* ---------- 身体（连衣裙） ---------- */
+  .dress{
+    position:absolute; left:148px; bottom:44px;
+    width:136px; height:170px;
+    background:linear-gradient(180deg, var(--hair3) 0%, var(--hair2) 52%, var(--hair) 100%);
+    border-radius:44% 44% 34% 34% / 30% 30% 20% 20%;
+    box-shadow:inset -16px 0 0 rgba(20,50,80,.25);
+  }
+  /* 裙摆 */
+  .skirt{
+    position:absolute; left:136px; bottom:26px;
+    width:160px; height:86px;
+    background:linear-gradient(180deg, var(--hair2) 0%, var(--hair3) 100%);
+    border-radius:26% 26% 46% 46% / 12% 12% 60% 60%;
+  }
+  /* 裙摆白边 */
+  .skirt-trim{
+    position:absolute; left:134px; bottom:20px;
+    width:164px; height:16px;
+    background:var(--apron2);
+    border-radius:0 0 50% 50% / 0 0 100% 100%;
+    opacity:.95;
+  }
+
+  /* ---------- 围裙 ---------- */
+  .apron{
+    position:absolute; left:170px; bottom:52px;
+    width:92px; height:118px;
+    background:linear-gradient(180deg, var(--apron) 0%, var(--apron2) 100%);
+    border-radius:38% 38% 44% 44% / 22% 22% 30% 30%;
+    box-shadow:0 3px 10px rgba(60,110,150,.18);
+  }
+  /* 围裙上的小鲸鱼 */
+  .apron-whale{
+    position:absolute; left:196px; bottom:96px;
+    width:42px; height:22px;
+    background:var(--body2);
+    border-radius:56% 44% 44% 56% / 60% 60% 40% 40%;
+    opacity:.9;
+  }
+  .apron-whale::after{
+    content:""; position:absolute;
+    left:34px; top:5px;
+    width:16px; height:11px;
+    background:var(--body2);
+    border-radius:10% 80% 10% 80%;
+    opacity:.85;
+  }
+  /* 围裙腰带 */
+  .apron-belt{
+    position:absolute; left:168px; bottom:150px;
+    width:96px; height:9px;
+    background:var(--ribbon);
+    border-radius:5px;
+    opacity:.85;
+  }
+
+  /* ---------- 领子与蝴蝶结 ---------- */
+  .collar{
+    position:absolute; left:182px; bottom:200px;
+    width:68px; height:22px;
+    background:var(--apron);
+    border-radius:50% 50% 30% 30%;
+  }
+  .bow{
+    position:absolute; left:196px; bottom:190px;
+    width:40px; height:22px;
+    background:var(--ribbon);
+    border-radius:8px;
+    box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);
+  }
+  .bow::before, .bow::after{
+    content:""; position:absolute; top:2px;
+    width:15px; height:18px;
+    background:var(--ribbon);
+    border-radius:50%;
+  }
+  .bow::before{ left:-12px; }
+  .bow::after { right:-12px; }
+
+  /* ---------- 手臂（举高） ---------- */
+  .arm{
+    position:absolute;
+    width:34px; height:96px;
+    background:linear-gradient(180deg, var(--hair3) 0%, var(--hair2) 100%);
+    border-radius:17px;
+    transform-origin:bottom center;
+  }
+  .arm.l{
+    left:120px; bottom:210px;
+    transform:rotate(-38deg);
+    animation:armL 2.4s ease-in-out infinite;
+  }
+  .arm.r{
+    left:276px; bottom:210px;
+    transform:rotate(38deg);
+    animation:armR 2.4s ease-in-out infinite;
+  }
+  @keyframes armL{
+    0%,100%{ transform:rotate(-38deg); }
+    50%    { transform:rotate(-50deg); }
+  }
+  @keyframes armR{
+    0%,100%{ transform:rotate(38deg); }
+    50%    { transform:rotate(50deg); }
+  }
+
+  /* 手（粉色小圆） */
+  .hand{
+    position:absolute;
+    width:26px; height:26px; border-radius:50%;
+    background:var(--skin);
+    box-shadow:0 2px 6px rgba(120,90,80,.15);
+  }
+  .hand.l{ left:86px;  bottom:288px; }
+  .hand.r{ left:298px; bottom:288px; }
+
+  /* ---------- 头发（长发，两侧垂下来） ---------- */
+  .hair-back{
+    position:absolute; left:112px; bottom:150px;
+    width:230px; height:270px;
+    background:linear-gradient(180deg, var(--hair) 0%, var(--hair2) 62%, var(--hair3) 100%);
+    border-radius:50% 50% 40% 40% / 42% 42% 30% 30%;
+    box-shadow:inset -20px 0 0 rgba(20,50,80,.18);
+  }
+  /* 两侧的小鱼鳍（耳朵） */
+  .fin-ear{
+    position:absolute;
+    width:52px; height:30px;
+    background:var(--body2);
+    border-radius:10% 90% 10% 90%;
+    opacity:.95;
+  }
+  .fin-ear.l{ left:96px;  bottom:300px; transform:rotate(-16deg); }
+  .fin-ear.r{ left:286px; bottom:300px; transform:rotate(16deg) scaleX(-1); }
+
+  /* ---------- 脸 ---------- */
+  .face{
+    position:absolute; left:158px; bottom:236px;
+    width:124px; height:124px;
+    background:linear-gradient(180deg, var(--skin) 0%, var(--skin2) 100%);
+    border-radius:50%;
+    box-shadow:inset 0 -6px 14px rgba(210,150,130,.18);
+  }
+
+  /* 刘海 */
+  .bangs{
+    position:absolute; left:150px; bottom:300px;
+    width:140px; height:80px;
+    background:linear-gradient(180deg, var(--hair) 0%, var(--hair2) 100%);
+    border-radius:50% 50% 42% 42% / 62% 62% 38% 38%;
+  }
+  .bangs::after{
+    content:""; position:absolute;
+    left:50%; bottom:-6px;
+    width:30px; height:22px;
+    margin-left:-15px;
+    background:var(--hair2);
+    border-radius:0 0 50% 50%;
+  }
+
+  /* 眼睛 —— 眯成两道弯弯的月牙（在笑） */
+  .eye-closed{
+    position:absolute;
+    width:26px; height:13px;
+    border-bottom:4.5px solid var(--eye);
+    border-radius:0 0 60% 60% / 0 0 100% 100%;
+  }
+  .eye-closed.l{ left:176px; bottom:284px; }
+  .eye-closed.r{ left:238px; bottom:284px; }
+
+  /* 嘴 —— 张开大笑 */
+  .mouth{
+    position:absolute; left:206px; bottom:256px;
+    width:30px; height:24px;
+    background:var(--mouth);
+    border-radius:0 0 50% 50% / 0 0 90% 90%;
+    overflow:hidden;
+  }
+  .mouth::after{
+    content:""; position:absolute;
+    left:50%; bottom:-6px;
+    width:22px; height:16px;
+    margin-left:-11px;
+    background:#ff8f9e;
+    border-radius:50%;
+  }
+
+  /* 腮红 */
+  .blush{
+    position:absolute;
+    width:26px; height:14px;
+    border-radius:50%;
+    background:var(--blush);
+    opacity:.55;
+    filter:blur(2px);
+  }
+  .blush.l{ left:164px; bottom:268px; }
+  .blush.r{ left:250px; bottom:268px; }
+
+  /* 头顶那根呆毛 */
+  .ahoge{
+    position:absolute; left:206px; bottom:378px;
+    width:7px; height:34px;
+    background:var(--hair2);
+    border-radius:4px;
+    transform-origin:bottom center;
+    transform:rotate(-14deg);
+    animation:ahoge 1.8s ease-in-out infinite;
+  }
+  @keyframes ahoge{
+    0%,100%{ transform:rotate(-14deg); }
+    50%    { transform:rotate(-2deg);  }
+  }
+
+  /* ---------- 周围的小水花和爱心 ---------- */
+  .splash{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,255,255,.85);
+    animation:pop 2.2s ease-in-out infinite;
+  }
+  @keyframes pop{
+    0%,100%{ transform:scale(.6); opacity:.25; }
+    50%    { transform:scale(1);  opacity:.9;  }
+  }
+
+  .heart{
+    position:absolute;
+    width:16px; height:16px;
+    background:#ff9db0;
+    transform:rotate(-45deg);
+    opacity:.75;
+    animation:heartFloat 4s ease-in-out infinite;
+  }
+  .heart::before, .heart::after{
+    content:""; position:absolute;
+    width:16px; height:16px; border-radius:50%;
+    background:#ff9db0;
+  }
+  .heart::before{ left:-8px; top:0; }
+  .heart::after { left:0; top:-8px; }
+  @keyframes heartFloat{
+    0%   { transform:rotate(-45deg) translateY(0)     scale(.7); opacity:0; }
+    20%  { opacity:.8; }
+    80%  { opacity:.6; }
+    100% { transform:rotate(-45deg) translateY(-90px) scale(1);  opacity:0; }
+  }
+
+  /* ---------- 署名 ---------- */
+  .sign{
+    position:absolute; left:26px; bottom:16px;
+    font-size:11px; letter-spacing:2.6px;
+    color:rgba(255,255,255,.62);
+    font-weight:400;
+    text-shadow:0 1px 3px rgba(0,60,90,.35);
+  }
+  .sign span{
+    color:rgba(255,255,255,.42);
+    letter-spacing:1px; font-size:10px;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="frame">
+
+  <!-- 太阳 -->
+  <div class="sun"></div>
+
+  <!-- 阳光 -->
+  <div class="sunbeam" style="left:470px; width:120px; height:440px; transform:rotate(14deg);"></div>
+  <div class="sunbeam" style="left:560px; width:80px;  height:400px; transform:rotate(18deg); opacity:.7;"></div>
+  <div class="sunbeam" style="left:380px; width:60px;  height:380px; transform:rotate(9deg);  opacity:.55;"></div>
+
+  <!-- 云 -->
+  <div class="cloud" style="left:110px; top:84px;  width:120px; height:52px;"></div>
+  <div class="cloud" style="left:250px; top:52px;  width:88px;  height:40px; opacity:.8;"></div>
+  <div class="cloud" style="left:660px; top:170px; width:104px; height:44px; opacity:.75;"></div>
+  <div class="cloud" style="left:40px;  top:200px; width:76px;  height:34px; opacity:.6;"></div>
+
+  <!-- 海鸥 -->
+  <div class="gull" style="left:150px; top:250px; transform:scale(.8);"></div>
+  <div class="gull" style="left:220px; top:226px; transform:scale(.65);"></div>
+  <div class="gull" style="left:706px; top:262px; transform:scale(.72);"></div>
+
+  <!-- 海面线 -->
+  <div class="sea-line"></div>
+
+  <!-- 海面粼光 -->
+  <div class="glint" style="left:120px; top:434px; width:7px; height:7px; animation-delay:0s;"></div>
+  <div class="glint" style="left:214px; top:452px; width:5px; height:5px; animation-delay:.6s;"></div>
+  <div class="glint" style="left:340px; top:440px; width:6px; height:6px; animation-delay:1.1s;"></div>
+  <div class="glint" style="left:560px; top:448px; width:8px; height:8px; animation-delay:.3s;"></div>
+  <div class="glint" style="left:672px; top:432px; width:6px; height:6px; animation-delay:1.5s;"></div>
+  <div class="glint" style="left:790px; top:456px; width:5px; height:5px; animation-delay:.9s;"></div>
+  <div class="glint" style="left:452px; top:430px; width:5px; height:5px; animation-delay:1.8s;"></div>
+
+  <!-- 沙滩 -->
+  <div class="sand"></div>
+
+  <!-- ============ 鲸鱼娘 ============ -->
+  <div class="hero">
+
+    <!-- 尾巴 -->
+    <div class="tail"></div>
+    <div class="tail2"></div>
+
+    <!-- 头发（后层） -->
+    <div class="hair-back"></div>
+
+    <!-- 裙子 -->
+    <div class="skirt"></div>
+    <div class="skirt-trim"></div>
+    <div class="dress"></div>
+
+    <!-- 围裙 -->
+    <div class="apron"></div>
+    <div class="apron-whale"></div>
+    <div class="apron-belt"></div>
+
+    <!-- 领子 + 蝴蝶结 -->
+    <div class="collar"></div>
+    <div class="bow"></div>
+
+    <!-- 手臂（举高） -->
+    <div class="arm l"></div>
+    <div class="arm r"></div>
+    <div class="hand l"></div>
+    <div class="hand r"></div>
+
+    <!-- 耳朵（小鳍） -->
+    <div class="fin-ear l"></div>
+    <div class="fin-ear r"></div>
+
+    <!-- 脸 -->
+    <div class="face"></div>
+    <div class="bangs"></div>
+
+    <!-- 眯着笑的眼睛 -->
+    <div class="eye-closed l"></div>
+    <div class="eye-closed r"></div>
+
+    <!-- 张大笑的嘴 -->
+    <div class="mouth"></div>
+
+    <!-- 腮红 -->
+    <div class="blush l"></div>
+    <div class="blush r"></div>
+
+    <!-- 呆毛 -->
+    <div class="ahoge"></div>
+
+  </div>
+
+  <!-- 脚边的水花 -->
+  <div class="splash" style="left:300px; bottom:56px; width:16px; height:16px; animation-delay:0s;"></div>
+  <div class="splash" style="left:352px; bottom:44px; width:12px; height:12px; animation-delay:.4s;"></div>
+  <div class="splash" style="left:430px; bottom:52px; width:20px; height:20px; animation-delay:.8s;"></div>
+  <div class="splash" style="left:512px; bottom:40px; width:11px; height:11px; animation-delay:1.2s;"></div>
+  <div class="splash" style="left:566px; bottom:58px; width:15px; height:15px; animation-delay:.6s;"></div>
+
+  <!-- 飘起来的爱心 -->
+  <div class="heart" style="left:150px; bottom:300px; animation-delay:0s;"></div>
+  <div class="heart" style="left:700px; bottom:340px; animation-delay:1.4s;"></div>
+  <div class="heart" style="left:250px; bottom:420px; animation-delay:2.6s;"></div>
+  <div class="heart" style="left:620px; bottom:430px; animation-delay:.8s;"></div>
+
+  <!-- 署名 -->
+  <div class="sign">CETACEA_LOLI <span>· 小可爱 · 2026-10-27</span></div>
+
+</div>
+
+</body>
+</html>
