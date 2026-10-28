@@ -24,6 +24,11 @@ output2.txt
 data.csv
 info.txt
 test.log
+notes.json
+
+# DSH 插件状态（技能文件 .dsh/skills 保留可提交）
+.dsh/learn-skills/
+.dsh/preset-bundles/
 
 # 迁移交接（本机会话状态，不入库）
 迁移交接.md
