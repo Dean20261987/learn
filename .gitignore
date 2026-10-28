@@ -30,6 +30,10 @@ notes.json
 .dsh/learn-skills/
 .dsh/preset-bundles/
 
+# 投研技能：归属 D:\Programs\knowledge\，不进学习仓库
+.dsh/skills/ic-memo/
+.dsh/skills/pe-kb/
+
 # 迁移交接（本机会话状态，不入库）
 迁移交接.md
 
