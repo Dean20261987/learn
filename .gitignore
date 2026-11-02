@@ -40,6 +40,10 @@ notes.json
 # 备份文件
 *.bak
 
+# 账本数据（个人隐私，不进仓库）
+data/
+.ledger/
+
 # DSH 权限修复报告
 .acl-recovery/
 
